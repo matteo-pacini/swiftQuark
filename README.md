@@ -7,7 +7,22 @@ Under development.
 ## ToDo
 
 - [ ] Linux Support
+- [ ] Goldleaf 0.7.2 USB protocol documentation
 
 ## Usage
 
 Run `Goldleaf` on the Nintendo Switch, then run `swiftQuark`.
+
+## Build
+
+Built using **Xcode 11 GM 2`**
+
+Clone the repository, then run:
+```bash
+swift build
+```
+
+To run `swiftQuark` run: 
+```
+./.build/debug/swiftQuark
+```
