@@ -1,6 +1,5 @@
 import Clibusb
 import Foundation
-import Cocoa
 
 final class NintendoSwitch {
     

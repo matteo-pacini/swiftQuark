@@ -18,7 +18,8 @@ let package = Package(
         .systemLibrary(name: "Clibusb",
             pkgConfig: "libusb-1.0",
             providers: [
-                .brew(["libusb"])
+                .brew(["libusb"]),
+                .apt(["libusb-1.0-0-dev"])
             ]),
         .target(
             name: "swiftQuark",
