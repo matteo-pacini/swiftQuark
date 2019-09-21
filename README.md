@@ -1,6 +1,6 @@
 # swiftQuark
 
-A [Goldleaf 1.7.2](https://github.com/XorTroll/Goldleaf) client written in Swift.
+A [Goldleaf 0.7.2](https://github.com/XorTroll/Goldleaf) client written in Swift.
 
 Under development.
 
