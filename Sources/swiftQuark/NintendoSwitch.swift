@@ -44,7 +44,9 @@ final class NintendoSwitch {
     }
     
     func release() {
+        debugPrint("Releasing interface \(NintendoSwitch.interfaceNumber)...")
         assert(libusb_release_interface(device, NintendoSwitch.interfaceNumber) == 0)
+        debugPrint("Closing USB device...")
         libusb_close(device)
         NintendoSwitch.sharedInstance = nil
     }
@@ -107,7 +109,9 @@ extension NintendoSwitch {
     func loop() {
         while true {
             debugPrint("Waiting for data...")
-            var data = readData()!
+            guard var data = readData() else {
+                break
+            }
             guard let magic = data.readMagic() else {
                 print("Received invalid magic")
                 break
@@ -242,7 +246,7 @@ extension NintendoSwitch {
                 write(data: &readData, withPadding: false)
 
             default:
-                print("Command \(command) not implemented!")
+                fatalError("Command \(command) not implemented!")
                 break
             }
 
