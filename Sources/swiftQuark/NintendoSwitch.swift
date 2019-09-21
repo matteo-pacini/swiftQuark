@@ -124,8 +124,7 @@ extension NintendoSwitch {
 
             case .getDriveCount:
                 debugPrint("getDriveCount -> \(Int32(FileSystemSnapshot.drives.count))")
-                outBuffer.write(magic: .GLCO)
-                outBuffer.write(int32: 0)
+                outBuffer.writeResponse()
                 outBuffer.write(int32: Int32(FileSystemSnapshot.drives.count))
                 write(data: &outBuffer)
     
@@ -134,8 +133,7 @@ extension NintendoSwitch {
                 let drive = FileSystemSnapshot.drives[Int(index)]
                 debugPrint("getDriveInfo -> \([drive.label, drive.path])")
                 
-                outBuffer.write(magic: .GLCO)
-                outBuffer.write(int32: 0)
+                outBuffer.writeResponse()
                 outBuffer.write(string: drive.label)
                 outBuffer.write(string: drive.path)
                 outBuffer.write(int32: 0)
@@ -144,8 +142,7 @@ extension NintendoSwitch {
 
             case .getSpecialPathCount:
                 debugPrint("getSpecialPathCount -> \(Int32(FileSystemSnapshot.specialPaths.count))")
-                outBuffer.write(magic: .GLCO)
-                outBuffer.write(int32: 0)
+                outBuffer.writeResponse()
                 outBuffer.write(int32: Int32(FileSystemSnapshot.specialPaths.count))
                 write(data: &outBuffer)
                 
@@ -154,14 +151,13 @@ extension NintendoSwitch {
                 let path = FileSystemSnapshot.specialPaths[Int(index)]
                 debugPrint("getSpecialPath -> \([path.label, path.path])")
               
-                outBuffer.write(magic: .GLCO)
-                outBuffer.write(int32: 0)
+                outBuffer.writeResponse()
                 outBuffer.write(string: path.label)
                 outBuffer.write(string: path.path)
                 write(data: &outBuffer)
                 
             case .getDirectoryCount:
-                let string = data.readStringU16LE()
+                let string = data.readString()
                 var cleanString = string
                     .replacingOccurrences(of: ":/", with: "")
                     .replacingOccurrences(of: " ", with: "%20")
@@ -172,43 +168,39 @@ extension NintendoSwitch {
                     
                 fileSystemSnapshot = FileSystemSnapshot(location: url)
             
-                outBuffer.write(magic: .GLCO)
-                outBuffer.write(int32: 0)
+                outBuffer.writeResponse()
                 outBuffer.write(int32: Int32(fileSystemSnapshot!.directories().count))
                 write(data: &outBuffer)
                 
             case .getDirectory:
-                let _ = data.readStringU16LE() // is this needed?
+                let _ = data.readString() // is this needed?
                 let index = data.readi32()
                 let directory = fileSystemSnapshot!.directories()[Int(index)]
                                     
                 print("getDirectory -> \(directory)")
                 
-                outBuffer.write(magic: .GLCO)
-                outBuffer.write(int32: 0)
+                outBuffer.writeResponse()
                 outBuffer.write(string: directory.lastPathComponent)
                 write(data: &outBuffer)
             
             case .getFileCount:
                 print("getFileCount -> \(Int32(fileSystemSnapshot!.files().count))")
-                outBuffer.write(magic: .GLCO)
-                outBuffer.write(int32: 0)
+                outBuffer.writeResponse()
                 outBuffer.write(int32: Int32(fileSystemSnapshot!.files().count))
                 write(data: &outBuffer)
                 
             case .getFile:
-                let _ = data.readStringU16LE() // is this needed?
+                let _ = data.readString() // is this needed?
                 let index = data.readi32()
                 let file = fileSystemSnapshot!.files()[Int(index)]
                 print("getFile -> \(file)")
                 
-                outBuffer.write(magic: .GLCO)
-                outBuffer.write(int32: 0)
+                outBuffer.writeResponse()
                 outBuffer.write(string: file.lastPathComponent)
                 write(data: &outBuffer)
                 
             case .statPath:
-                let string = data.readStringU16LE()
+                let string = data.readString()
                 let path = string
                     .replacingOccurrences(of: "file://", with: "")
                     .replacingOccurrences(of: ":/", with: "")
@@ -217,8 +209,7 @@ extension NintendoSwitch {
                          .attributesOfItem(atPath: path)) ?? [:]
                 debugPrint("statPath -> \(path)")
                 
-                outBuffer.write(magic: .GLCO)
-                outBuffer.write(int32: 0)
+                outBuffer.writeResponse()
 
                 if (attributes[.type] as? String) == FileAttributeType.typeDirectory.rawValue {
                     outBuffer.write(int32: 2)
@@ -231,7 +222,7 @@ extension NintendoSwitch {
                 write(data: &outBuffer)
                 
             case .readFile:
-                let string = data.readStringU16LE()
+                let string = data.readString()
                              .replacingOccurrences(of: " ", with: "%20")
                 let offset = data.readi64()
                 let length = data.readi64()
@@ -245,8 +236,7 @@ extension NintendoSwitch {
                 
                 var readData = mappedData.subdata(in: startIndex..<endIndex)
                 
-                outBuffer.write(magic: .GLCO)
-                outBuffer.write(int32: 0)
+                outBuffer.writeResponse()
                 outBuffer.write(int64: Int64(readData.count))
                 write(data: &outBuffer)
                 write(data: &readData, withPadding: false)

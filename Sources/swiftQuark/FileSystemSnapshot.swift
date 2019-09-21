@@ -23,8 +23,9 @@ struct File {
 
 struct FileSystemSnapshot {
     
-    static let drives: [File] = (FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: nil,
-                                                               options: .skipHiddenVolumes) ?? [])
+    static let drives: [File] =
+        (FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: nil,
+                                               options: .skipHiddenVolumes) ?? [])
         .map { File(url: $0) }
     
     static let specialPaths: [File] = [
