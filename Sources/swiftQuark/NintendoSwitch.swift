@@ -11,7 +11,7 @@ final class NintendoSwitch {
     private static let writeEndpoint: UInt8 = 0x1
     private static let interfaceNumber: Int32 = 0
     private static let configuration: Int32 = 1
-    private static let bulkReadSize: Int32 = 0x1000
+    private static let bulkTransferSize: Int32 = 0x1000
     
     private static var sharedInstance: NintendoSwitch?
     
@@ -61,12 +61,12 @@ final class NintendoSwitch {
 extension NintendoSwitch {
     
     func readData() -> Data? {
-        let data = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(NintendoSwitch.bulkReadSize))
+        let data = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(NintendoSwitch.bulkTransferSize))
         var actualLength: Int32 = 0
         let res = libusb_bulk_transfer(device,
                              NintendoSwitch.readEndpoint,
                              data,
-                             NintendoSwitch.bulkReadSize,
+                             NintendoSwitch.bulkTransferSize,
                              &actualLength,
                              0)
             
@@ -84,15 +84,19 @@ extension NintendoSwitch {
     
     func write(data: inout Data, withPadding: Bool = true) {
         if withPadding {
-            let padding = Int(NintendoSwitch.bulkReadSize) - data.count
+            let padding = Int(NintendoSwitch.bulkTransferSize) - data.count
             let actualPadding = (0...padding).map { _ in UInt8(0) }
             data.append(contentsOf: actualPadding)
         }
         var actualLength: Int32 = 0
         let res = libusb_bulk_transfer(device,
                              NintendoSwitch.writeEndpoint,
-                             data.withUnsafeMutableBytes { $0 },
-                             withPadding ? NintendoSwitch.bulkReadSize : Int32(data.count),
+                             data.withUnsafeMutableBytes {
+                                $0.baseAddress!.assumingMemoryBound(to: UInt8.self)
+                             },
+                             withPadding ?
+                                NintendoSwitch.bulkTransferSize :
+                                Int32(data.count),
                              &actualLength,
                              0)
             

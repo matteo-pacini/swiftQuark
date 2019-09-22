@@ -12,7 +12,7 @@ extension NintendoSwitch {
                 break
             }
             
-            guard let magic = data.readMagic() else {
+            guard let _ = data.readMagic() else {
                 print("Received invalid magic")
                 break
             }
