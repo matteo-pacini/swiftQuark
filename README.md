@@ -15,7 +15,8 @@ Run `Goldleaf` on the Nintendo Switch, then run `swiftQuark`.
 
 ## Build
 
-Built using **Xcode 11 GM 2** (swift 5.1 toolchain).
+Built using **Xcode 11** (swift 5.1 toolchain).
+
 Linux toolchains are available [here](https://swift.org/download/#releases).
 
 Clone the repository, then run:

@@ -22,12 +22,12 @@ extension Data {
     
     /// Reads a UTF16-LE encoded string from the data.
     /// 4+sizeof(string) bytes are then removed.
-    mutating func readString() -> String {
+    mutating func readString(cleanGibberish: Bool = true) -> String {
         let size = Int(readi32() * 2)
         let stringData = subdata(in: startIndex..<startIndex.advanced(by: size))
         let string = String(data: stringData, encoding: .utf16LittleEndian)!
         removeSubrange(startIndex..<startIndex.advanced(by: size))
-        return string
+        return cleanGibberish ? string.replacingOccurrences(of: ":/", with: "/") : string
     }
     
     /// Reads a 32-bit integer from the data.
