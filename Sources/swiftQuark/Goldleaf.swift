@@ -2,6 +2,14 @@ import Foundation
 
 enum Goldleaf {
 
+    static let vendorId: UInt16 = 0x057E
+    static let productId: UInt16 = 0x3000
+    static let readEndpoint: UInt8 = 0x81
+    static let writeEndpoint: UInt8 = 0x1
+    static let interfaceNumber: Int32 = 0
+    static let configuration: Int32 = 1
+    static let bulkTransferSize: Int32 = 0x1000
+
     enum Magic: String {
 
         case GLCI
