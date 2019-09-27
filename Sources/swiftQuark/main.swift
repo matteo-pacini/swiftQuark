@@ -19,7 +19,7 @@ do {
     nintendoSwitch?.configuration = Goldleaf.configuration
     try nintendoSwitch?.claimInterface(Goldleaf.interfaceNumber)
 
-    loop(nintendoSwitch: nintendoSwitch)
+    try loop(nintendoSwitch: nintendoSwitch)
 
     exit(0)
 

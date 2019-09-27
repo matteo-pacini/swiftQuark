@@ -7,7 +7,7 @@ private var cachedFiles: [URL]?
 private var mappedFile: Data?
 private var mappedFileURL: URL?
 
-func loop(nintendoSwitch: USB.Device?) {
+func loop(nintendoSwitch: USB.Device?) throws {
     while true {
         debugPrint("Waiting for data...")
 
@@ -142,6 +142,11 @@ func loop(nintendoSwitch: USB.Device?) {
                                   withPadding: false,
                                   toEndpoint: Goldleaf.writeEndpoint)
             continue
+
+        case .delete:
+            let _ = data.readi32()
+            let path = data.readString()
+            try FileManager.default.removeItem(atPath: path)
 
         default:
             fatalError("Command \(command) not implemented!")
