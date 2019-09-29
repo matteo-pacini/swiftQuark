@@ -1,5 +1,45 @@
 import Foundation
 
+// MARK: - Response
+enum Response {
+    case success
+    case failure(Int32)
+
+    var code: Int32 {
+        switch self {
+        case .success:
+            return 0
+        case let .failure(code):
+            return code
+        }
+    }
+
+}
+
+// MARK: - Operator
+infix operator <<
+
+func << (lhs: inout Data, response: Response) {
+    lhs.write(magic: .GLCO)
+    lhs.write(int32: response.code)
+}
+
+func << (lhs: inout Data, int: Int) {
+    lhs.write(int: Int32(int))
+}
+
+func << (lhs: inout Data, int32: Int32) {
+    lhs.write(int: int32)
+}
+
+func << (lhs: inout Data, int64: Int64) {
+    lhs.write(int: int64)
+}
+
+func << (lhs: inout Data, string: String) {
+    lhs.write(string: string)
+}
+
 // MARK: - Read
 
 extension Data {
@@ -42,7 +82,7 @@ extension Data {
         return readi()
     }
     
-    mutating private func readi<T>() -> T where T: FixedWidthInteger {
+    mutating fileprivate func readi<T>() -> T where T: FixedWidthInteger {
         let bytes = T.bitWidth / 8
         let range = startIndex..<startIndex.advanced(by: bytes)
         let value = withUnsafeBytes { ptr in
@@ -58,7 +98,7 @@ extension Data {
 extension Data {
     
     /// Writes a Goldleaf magic number to the data.
-    private mutating func write(magic: Goldleaf.Magic) {
+    fileprivate mutating func write(magic: Goldleaf.Magic) {
         debugPrint("Writing magic: \(magic)")
         append(contentsOf: magic.data)
     }
@@ -69,7 +109,7 @@ extension Data {
         write(int32: code)
     }
     
-    mutating private func write<T>(int: T) where T: FixedWidthInteger {
+    mutating fileprivate func write<T>(int: T) where T: FixedWidthInteger {
         debugPrint("Writing \(String(describing: T.self)): \(int)")
         let data = Swift.withUnsafeBytes(of: int.littleEndian) { ( ptr: UnsafeRawBufferPointer) in
             [UInt8](ptr)

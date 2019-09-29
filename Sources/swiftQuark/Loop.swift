@@ -32,33 +32,33 @@ func loop(nintendoSwitch: USB.Device?) throws {
 
         case .getDriveCount:
             debugPrint("getDriveCount -> \(Int32(FileSystem.drives.count))")
-            outBuffer.writeResponse()
-            outBuffer.write(int32: Int32(FileSystem.drives.count))
+            outBuffer << .success
+            outBuffer << Int32(FileSystem.drives.count)
 
         case .getDriveInfo:
             let index = data.readi32()
             let drive = FileSystem.drives[Int(index)]
             debugPrint("getDriveInfo -> \([drive.driveName, drive.path])")
 
-            outBuffer.writeResponse()
-            outBuffer.write(string: drive.driveName)
-            outBuffer.write(string: drive.path)
-            outBuffer.write(int32: 0)
-            outBuffer.write(int32: 0)
+            outBuffer << .success
+            outBuffer << drive.driveName
+            outBuffer << drive.path
+            outBuffer << 0
+            outBuffer << 0
 
         case .getSpecialPathCount:
             debugPrint("getSpecialPathCount -> \(Int32(FileSystem.specialPaths.count))")
-            outBuffer.writeResponse()
-            outBuffer.write(int32: Int32(FileSystem.specialPaths.count))
+            outBuffer << .success
+            outBuffer << Int32(FileSystem.specialPaths.count)
 
         case .getSpecialPath:
             let index = data.readi32()
             let path = FileSystem.specialPaths[Int(index)]
             debugPrint("getSpecialPath -> \([path.lastPathComponent, path.path])")
 
-            outBuffer.writeResponse()
-            outBuffer.write(string: path.lastPathComponent)
-            outBuffer.write(string: path.path)
+            outBuffer << .success
+            outBuffer << path.lastPathComponent
+            outBuffer << path.path
 
         case .getDirectoryCount:
             let string = data.readString()
@@ -67,8 +67,8 @@ func loop(nintendoSwitch: USB.Device?) throws {
             let url = URL(string: "file://\(string)")!
             cachedSubdirectories = url.subDirectories
 
-            outBuffer.writeResponse()
-            outBuffer.write(int32: Int32(cachedSubdirectories!.count))
+            outBuffer << .success
+            outBuffer << Int32(cachedSubdirectories!.count)
 
         case .getDirectory:
             let _ = data.readString()
@@ -77,8 +77,8 @@ func loop(nintendoSwitch: USB.Device?) throws {
 
             print("getDirectory -> \(url.path)")
 
-            outBuffer.writeResponse()
-            outBuffer.write(string: url.lastPathComponent)
+            outBuffer << .success
+            outBuffer << url.lastPathComponent
 
         case .getFileCount:
             let string = data.readString()
@@ -86,8 +86,8 @@ func loop(nintendoSwitch: USB.Device?) throws {
             cachedFiles = url.files
 
             print("getFileCount -> \(string)")
-            outBuffer.writeResponse()
-            outBuffer.write(int32: Int32(cachedFiles!.count))
+            outBuffer << .success
+            outBuffer << Int32(cachedFiles!.count)
 
         case .getFile:
             let _ = data.readString()
@@ -95,8 +95,8 @@ func loop(nintendoSwitch: USB.Device?) throws {
             let url = cachedFiles![Int(index)]
             print("getFile -> \(url.path)")
 
-            outBuffer.writeResponse()
-            outBuffer.write(string: url.lastPathComponent)
+            outBuffer << .success
+            outBuffer << url.lastPathComponent
 
         case .statPath:
             let string = data.readString()
@@ -106,11 +106,11 @@ func loop(nintendoSwitch: USB.Device?) throws {
             outBuffer.writeResponse()
 
             if url.isDirectory {
-                outBuffer.write(int32: 2)
-                outBuffer.write(int64: 0)
+                outBuffer << 2
+                outBuffer << Int64(0)
             } else {
-                outBuffer.write(int32: 1)
-                outBuffer.write(int64: url.fileSize)
+                outBuffer << 1
+                outBuffer << Int64(url.fileSize)
             }
 
         case .readFile:
@@ -132,8 +132,8 @@ func loop(nintendoSwitch: USB.Device?) throws {
 
             var readData = mappedFile!.subdata(in: startIndex..<endIndex)
 
-            outBuffer.writeResponse()
-            outBuffer.write(int64: Int64(readData.count))
+            outBuffer << .success
+            outBuffer << Int64(readData.count)
             nintendoSwitch?.write(data: &outBuffer,
                                   withPadding: true,
                                   transferSizeForPadding: Int(Goldleaf.bulkTransferSize),
@@ -146,7 +146,12 @@ func loop(nintendoSwitch: USB.Device?) throws {
         case .delete:
             let _ = data.readi32()
             let path = data.readString()
-            try FileManager.default.removeItem(atPath: path)
+            do {
+                try FileManager.default.removeItem(atPath: path)
+                outBuffer << .success
+            } catch {
+                outBuffer << .failure(1)
+            }
 
         default:
             fatalError("Command \(command) not implemented!")
