@@ -124,7 +124,7 @@ func loop(nintendoSwitch: USB.Device?) throws {
             if url != mappedFileURL {
                 debugPrint("readFile - Setting mappedFile and mappedFileURL")
                 mappedFileURL = url
-                mappedFile = try! Data(contentsOf: url, options: .mappedRead)
+                mappedFile = try! Data(contentsOf: url, options: .mappedIfSafe)
             }
 
             let startIndex = mappedFile!.startIndex.advanced(by: Int(offset))

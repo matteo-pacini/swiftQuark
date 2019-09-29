@@ -20,6 +20,18 @@ final class USB {
 extension USB {
 
     enum Error: Int, Swift.Error {
+        case io = -1
+        case invalidParam = -2
+        case access = -3
+        case noDevice = -4
+        case notFound = -5
+        case busy = -6
+        case timeout = -7
+        case overflow = -8
+        case pipe = -9
+        case interrupted = -10
+        case noMem = -11
+        case notSupported = -12
         case other = -99
         case unknown = -1000
     }

@@ -1,8 +1,19 @@
 import Clibusb
 import Foundation
+#if os(Linux)
+import Glibc
+#endif
 
 print("swiftQuark v0.1")
 print("Author: Matteo Pacini <m@matteopacini.me>\n")
+
+#if os(Linux)
+if getuid() != 0 {
+    print("Libusb on Linux requires root privileges.")
+    print("Try running swiftQuark with sudo.")
+    exit(1)
+}
+#endif
 
 do {
 
@@ -24,5 +35,6 @@ do {
     exit(0)
 
 } catch {
+    debugPrint(error)
     print("A USB error occurred: \(error.localizedDescription).")
 }
