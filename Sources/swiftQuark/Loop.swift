@@ -4,7 +4,7 @@ import Foundation
 
 private var cachedSubdirectories: [URL]?
 private var cachedFiles: [URL]?
-private var mappedFile: Data?
+private var mappedFile: MappedFile?
 private var mappedFileURL: URL?
 
 func loop(nintendoSwitch: USB.Device?) throws {
@@ -99,7 +99,11 @@ func loop(nintendoSwitch: USB.Device?) throws {
             outBuffer << url.lastPathComponent
 
         case .statPath:
+            #if os(Linux)
+            let string = data.readString().replacingOccurrences(of: "//", with: "/")
+            #else
             let string = data.readString()
+            #endif
             let url = URL(string: "file://\(string)".replacingOccurrences(of: " ", with: "%20"))!
             debugPrint("statPath -> \(string)")
 
@@ -114,7 +118,11 @@ func loop(nintendoSwitch: USB.Device?) throws {
             }
 
         case .readFile:
+            #if os(Linux)
+            let string = data.readString().replacingOccurrences(of: "//", with: "/")
+            #else
             let string = data.readString()
+            #endif
             let offset = data.readi64()
             let length = data.readi64()
             let url = URL(string: "file://\(string)".replacingOccurrences(of: " ", with: "%20"))!
@@ -124,13 +132,13 @@ func loop(nintendoSwitch: USB.Device?) throws {
             if url != mappedFileURL {
                 debugPrint("readFile - Setting mappedFile and mappedFileURL")
                 mappedFileURL = url
-                mappedFile = try! Data(contentsOf: url, options: .mappedIfSafe)
+                mappedFile = try MappedFile(url: url)
             }
 
-            let startIndex = mappedFile!.startIndex.advanced(by: Int(offset))
+            let startIndex = mappedFile!.data.startIndex.advanced(by: Int(offset))
             let endIndex =  startIndex.advanced(by: Int(length))
 
-            var readData = mappedFile!.subdata(in: startIndex..<endIndex)
+            var readData = mappedFile!.data.subdata(in: startIndex..<endIndex)
 
             outBuffer << .success
             outBuffer << Int64(readData.count)

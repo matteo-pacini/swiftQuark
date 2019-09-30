@@ -9,7 +9,7 @@ print("Author: Matteo Pacini <m@matteopacini.me>\n")
 
 #if os(Linux)
 if getuid() != 0 {
-    print("Libusb on Linux requires root privileges.")
+    print("USB device access requires root privileges on Linux.")
     print("Try running swiftQuark with sudo.")
     exit(1)
 }
