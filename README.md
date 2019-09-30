@@ -6,7 +6,7 @@ Under development.
 
 ## ToDo
 
-- [ ] Linux Support
+- [ X] Linux Support 
 - [ ] Goldleaf 0.7.2 USB protocol documentation
 
 ## Usage
@@ -28,3 +28,7 @@ To run `swiftQuark` run:
 ```
 ./.build/debug/swiftQuark
 ```
+
+## Linux
+
+Tested on `Ubuntu 18.04` with `Swift 5.1` toolchain.
