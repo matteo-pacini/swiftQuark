@@ -6,7 +6,7 @@ Under development.
 
 ## ToDo
 
-- [ X] Linux Support 
+- [X] Linux Support 
 - [ ] Goldleaf 0.7.2 USB protocol documentation
 
 ## Usage
