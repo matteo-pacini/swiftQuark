@@ -104,7 +104,8 @@ func loop(nintendoSwitch: USB.Device?) throws {
             #else
             let string = data.readString()
             #endif
-            let url = URL(string: "file://\(string)".replacingOccurrences(of: " ", with: "%20"))!
+            let encodedString = string.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)!
+            let url = URL(string: "file://\(encodedString)")!
             debugPrint("statPath -> \(string)")
 
             outBuffer.writeResponse()
@@ -123,9 +124,10 @@ func loop(nintendoSwitch: USB.Device?) throws {
             #else
             let string = data.readString()
             #endif
+            let encodedString = string.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)!
             let offset = data.readi64()
             let length = data.readi64()
-            let url = URL(string: "file://\(string)".replacingOccurrences(of: " ", with: "%20"))!
+            let url = URL(string: "file://\(encodedString)")!
 
             debugPrint("readFile(\(string), \(offset), \(length))")
 
