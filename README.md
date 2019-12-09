@@ -1,3 +1,8 @@
+# DEPRECATED
+
+Currently rewriting this tool in C99 as dealing with pointers in Swift has been quite traumatic.
+Long live C!
+
 # swiftQuark
 
 A [Goldleaf 0.7.3](https://github.com/XorTroll/Goldleaf) client written in Swift.
